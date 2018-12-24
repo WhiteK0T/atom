@@ -8,56 +8,167 @@ import java.util.ListIterator;
 
 public class CustomLinkedList<E> implements List<E> {
 
+    transient int size = 0;
+
+    transient ListNode<E> first;
+
+    transient ListNode<E> last;
+
     @Override
     public int size() {
-        throw new UnsupportedOperationException();
+        return size;
     }
 
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException();
+        return size == 0;
     }
 
     @Override
     public boolean contains(Object o) {
-        throw new UnsupportedOperationException();
+        return indexOf(o) >= 0;
     }
 
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException();
+        return new Iterator<E>() {
+
+            ListNode<E> pos = first;
+
+            @Override
+            public boolean hasNext() {
+                if (pos == null) return false;
+                return true;
+            }
+
+            @Override
+            public E next() {
+                E result = pos.item;
+                pos = pos.next;
+                return result;
+            }
+        };
     }
 
     @Override
     public boolean add(E e) {
-        throw new UnsupportedOperationException();
+        final ListNode<E> l = last;
+        final ListNode<E> newNode = new ListNode<>(e, l, null);
+        last = newNode;
+        if (l == null)
+            first = newNode;
+        else
+            l.next = newNode;
+        size++;
+        return true;
     }
 
     @Override
     public boolean remove(Object o) {
-        throw new UnsupportedOperationException();
+        if (o == null) {
+            for (ListNode<E> x = first; x != null; x = x.next) {
+                if (x.item == null) {
+                    unlink(x);
+                    return true;
+                }
+            }
+        } else {
+            for (ListNode<E> x = first; x != null; x = x.next) {
+                if (o.equals(x.item)) {
+                    unlink(x);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
     public void clear() {
-        throw new UnsupportedOperationException();
+        for (ListNode<E> x = first; x != null; ) {
+            ListNode<E> next = x.next;
+            x.item = null;
+            x.next = null;
+            x.prev = null;
+            x = next;
+        }
+        first = last = null;
+        size = 0;
     }
 
     @Override
     public E get(int index) {
-        throw new UnsupportedOperationException();
+        if (!(index >= 0 && index < size)) {
+            throw new IndexOutOfBoundsException(index);
+        }
+        return node(index).item;
     }
 
     @Override
     public int indexOf(Object o) {
-        throw new UnsupportedOperationException();
+        int index = 0;
+        if (o == null) {
+            for (ListNode<E> x = first; x != null; x = x.next) {
+                if (x.item == null)
+                    return index;
+                index++;
+            }
+        } else {
+            for (ListNode<E> x = first; x != null; x = x.next) {
+                if (o.equals(x.item))
+                    return index;
+                index++;
+            }
+        }
+        return -1;
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        throw new UnsupportedOperationException();
+        for (E e : c) {
+            add(e);
+        }
+        return true;
     }
 
+    private ListNode<E> node(int index) {
+
+        if (index < (size >> 1)) {
+            ListNode<E> x = first;
+            for (int i = 0; i < index; i++)
+                x = x.next;
+            return x;
+        } else {
+            ListNode<E> x = last;
+            for (int i = size - 1; i > index; i--)
+                x = x.prev;
+            return x;
+        }
+    }
+
+    private E unlink(ListNode<E> x) {
+        final E element = x.item;
+        final ListNode<E> next = x.next;
+        final ListNode<E> prev = x.prev;
+
+        if (prev == null) {
+            first = next;
+        } else {
+            prev.next = next;
+            x.prev = null;
+        }
+
+        if (next == null) {
+            last = prev;
+        } else {
+            next.prev = prev;
+            x.next = null;
+        }
+
+        x.item = null;
+        size--;
+        return element;
+    }
 
     /*
       !!! Implement methods below Only if you know what you are doing !!!

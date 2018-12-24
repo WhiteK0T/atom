@@ -11,8 +11,7 @@ import java.util.List;
  * Created by a.pomosov on 07/03/2018.
  */
 public class ResourceReader {
-    public static List<String> readFromResource(String resourceName)
-            throws IOException {
+    public static List<String> readFromResource(String resourceName) throws IOException {
         InputStream inputStream = ResourceReader.class.getClassLoader().getResourceAsStream(resourceName);
         ArrayList<String> lines = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
